@@ -1,4 +1,5 @@
 import preproc
+import re
 
 # --------------- functions for computing features ----------------
 
@@ -75,3 +76,9 @@ def add_articles(df, user_dict, articles_array = ['a', 'an', 'the']):
 	df['articles'] = df['user_id'].map(lambda id: get_user_word_count(user_dict[id], articles_array)).astype(float)
 
 	return df
+
+#counts all the matches of links in a tweet
+def getUrlCount(tweet):
+	m=re.findall('https://', tweet)
+	n=re.findall('http://', tweet)
+	return len(m)+len(n)
