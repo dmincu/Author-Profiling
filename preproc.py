@@ -30,6 +30,9 @@ def load_users(path):
         
     return users
 
+#users: list of all users
+#Returns a listof tokens from user tweets. It splits by non-alphanumeric
+#characters.
 def get_all_documents(users):
     docs = {}
 
