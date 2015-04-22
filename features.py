@@ -1,5 +1,6 @@
 import operator
 import preproc
+import re
 
 from gensim import corpora, models, similarities
 
@@ -32,16 +33,62 @@ def get_user_self_ref_count(id, users):
 
 	return count
 
+#user: User instance
+#dictionary: list of words
+#Returns the number of words from the dictionary that appear in the
+#user's documents
+def get_user_word_count(user, dictionary):
+	count = 0
+	for tweet in user.documents:
+		toks = tweet.split()
+		for tok in toks:
+		    if tok in dictionary:
+		        count += 1
+
+	return count
+
 #df: users dataframe
 #users: array of User instances
 #Add the 'self_ref_count' feature to the users dataframe
 #and return the modified dataframe
 def add_self_references_count(df, users):
-    df['self_ref_count'] = df['user_id'].map(lambda id : get_user_self_ref_count(id, users))
+    df['self_ref_count'] = df['user_id'].map(lambda id : get_user_self_ref_count(id, users)).astype(float)
 
     return df
 
+#df: user dataframe
+#user_dict: dictionary where key = user_id, value = User instance
+#pos_dictionary: list of positive words
+#Adds the 'pos_words' feature to the dataframe, which measures
+#the number of positive words in the user's tweets
+def add_positive_words(df, user_dict, pos_dictionary):
+	df['pos_words'] = df['user_id'].map(lambda id: get_user_word_count(user_dict[id], pos_dictionary)).astype(float)
 
+	return df
+
+#df: user dataframe
+#user_dict: dictionary where key = user_id, value = User instance
+#pos_dictionary: list of negative words
+#Adds the 'neg_words' feature to the dataframe, which measures
+#the number of negative words in the user's tweets
+def add_negative_words(df, user_dict, neg_dictionary):
+	df['neg_words'] = df['user_id'].map(lambda id: get_user_word_count(user_dict[id], neg_dictionary)).astype(float)
+
+	return df
+
+#df: user dataframe
+#user_dict: dictionary where key = user_id, value = User instance
+#articles_array: list of definite and indefinite articles
+#Adds the 'neg_words' feature to the dataframe, which measures
+#the number of negative words in the user's tweets
+def add_articles(df, user_dict, articles_array = ['a', 'an', 'the']):
+	df['articles'] = df['user_id'].map(lambda id: get_user_word_count(user_dict[id], articles_array)).astype(float)
+
+	return df
+
+#df: user dataframe
+#users: list of all users
+#Extracts topics and adds the top ones as features in the dataframe
 def add_topics(df, users):
 	user_sentences = preproc.get_all_documents(users)
 
@@ -60,7 +107,10 @@ def add_topics(df, users):
 		print toprint
 	print
 
-
+#df: user dataframe
+#users: list of all users
+#Extracts most frequent words with a length over 6 and adds them as features
+#in the dataframe
 def add_long_words(df, users):
 	docs = preproc.get_all_documents(users)
 
@@ -92,6 +142,11 @@ def add_long_words(df, users):
 
 	return df
 
+#counts all the matches of links in a tweet
+def getUrlCount(tweet):
+	m=re.findall('https://', tweet)
+	n=re.findall('http://', tweet)
+	return len(m)+len(n)
 
 if __name__ == "__main__":
 	path = 'pan15-author-profiling-training-dataset-2015-03-02\\pan15-author-profiling-training-dataset-english-2015-03-02\\'
