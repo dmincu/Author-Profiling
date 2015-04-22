@@ -1,4 +1,5 @@
 import preproc
+import re
 
 # --------------- functions for computing features ----------------
 
@@ -31,3 +32,11 @@ def add_self_references_count(df, users):
     df['self_ref_count'] = df['user_id'].map(lambda id : get_user_self_ref_count(id, users))
 
     return df
+
+#counts all the matches of links in a tweet
+def getUrlCount(tweet):
+	m=re.findall('https://', tweet)
+	n=re.findall('http://', tweet)
+	return len(m)+len(n)
+
+	
