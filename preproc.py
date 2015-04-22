@@ -1,11 +1,8 @@
 import xml.etree.ElementTree as ET
 import os
-<<<<<<< HEAD
 import re
-
-=======
 import pandas as pd
->>>>>>> 78eb645f17de454aa19feb8588ecfe6d836e03b7
+
 from user import User
 
 #-------functions for preprocessing data--------

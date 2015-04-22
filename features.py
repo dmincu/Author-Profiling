@@ -8,6 +8,7 @@ from gensim import corpora, models, similarities
 
 LONGWORDLEN = 6
 COUNTTOPWORDS = 20
+NUMTOPICS = 5
 
 
 # --------------- functions for computing features ----------------
@@ -89,13 +90,22 @@ def add_articles(df, user_dict, articles_array = ['a', 'an', 'the']):
 #df: user dataframe
 #users: list of all users
 #Extracts topics and adds the top ones as features in the dataframe
+
+#TODO: find other way to extract topics
 def add_topics(df, users):
 	user_sentences = preproc.get_all_documents(users)
 
-	texts = user_sentences[0]
+	texts = []
+	for user, doc in user_sentences.iteritems():
+		texts.append(doc)
+
+	all_tokens = sum(texts, [])
+	tokens_once = set(word for word in set(all_tokens) if all_tokens.count(word) == 1)
+	texts = [[word for word in text if word not in tokens_once] for text in texts]
+
 	id2word = corpora.Dictionary(texts)
 	mm = [id2word.doc2bow(text) for text in texts]
-	lda = models.ldamodel.LdaModel(corpus=mm, id2word=id2word, num_topics=clusters, update_every=1, chunksize=10000, passes=1)
+	lda = models.ldamodel.LdaModel(corpus=mm, id2word=id2word, num_topics=NUMTOPICS, update_every=1, chunksize=10000, passes=10)
 
 	print
 	# Prints the topics.
@@ -152,4 +162,4 @@ if __name__ == "__main__":
 	path = 'pan15-author-profiling-training-dataset-2015-03-02\\pan15-author-profiling-training-dataset-english-2015-03-02\\'
 	users = preproc.load_users(path)
 
-	#add_long_words("", users)
+	add_topics("", users)
