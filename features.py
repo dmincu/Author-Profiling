@@ -82,3 +82,15 @@ def getUrlCount(tweet):
 	m=re.findall('https://', tweet)
 	n=re.findall('http://', tweet)
 	return len(m)+len(n)
+
+def get_user_url_count(user):
+	count = 0
+	for doc in user.documents:
+		count += getUrlCount(doc)
+
+	return count
+
+def add_url_count(df, user_dict):
+	df['url_count'] = df['user_id'].map(lambda user_id : get_user_url_count(user_dict[user_id])).astype(float)
+
+	return df
