@@ -1,6 +1,8 @@
 import xml.etree.ElementTree as ET
 import os
+import re
 import pandas as pd
+
 from user import User
 
 #-------functions for preprocessing data--------
@@ -24,6 +26,20 @@ def load_users(path):
         users.append(user)
         
     return users
+
+#users: list of all users
+#Returns a listof tokens from user tweets. It splits by non-alphanumeric
+#characters.
+def get_all_documents(users):
+    docs = {}
+
+    for user in users:
+        rez = []
+        for x in user.get_documents():
+            rez = rez + re.findall(r"\w+", x.encode('utf-8'))
+        docs[user] = rez
+
+    return docs
 
 #Similar to load_users, but returns a dictionary where key = user_id and
 #value = User instance
@@ -73,7 +89,6 @@ def create_users_dataframe(path):
 
     return df
 
-def main():
-	path = 'pan15-author-profiling-training-dataset-2015-03-02\\pan15-author-profiling-training-dataset-english-2015-03-02\\'
-	users = load_users(path)
-	print users[0].get_documents()
+if __name__ == "__main__":
+    path = 'pan15-author-profiling-training-dataset-2015-03-02\\pan15-author-profiling-training-dataset-english-2015-03-02\\'
+    users = load_users(path)
