@@ -135,7 +135,7 @@ def add_long_words(df, users):
 
 	sorted_rez = sorted(rez.iteritems(), key=operator.itemgetter(1), reverse=True)
 
-	print sorted_rez
+	#print sorted_rez
 
 	result = []
 	for i in range(COUNTTOPWORDS):
@@ -143,12 +143,12 @@ def add_long_words(df, users):
 
 	print result
 
-	for user, doc in docs.iteritems():
-		for elem in result:
-			if elem in doc:
-				df[user.user_id][elem] = 1
-			else:
-				df[user.user_id][elem] = 0
+	id_docs = {}
+	for u in docs:
+		id_docs[u.user_id] = docs[u]
+
+	for elem in result:
+		df[elem] = df['user_id'].map(lambda user_id : 1 if elem in id_docs[user_id] else 0)
 
 	return df
 
