@@ -92,15 +92,20 @@ def get_topics_for_text(texts):
 	mm = [id2word.doc2bow(text) for text in texts]
 	lda = models.ldamodel.LdaModel(corpus=mm, id2word=id2word, num_topics=NUMTOPICS, update_every=1, chunksize=10000, passes=10)
 
-	print
+	topic_words = {}
 	# Prints the topics.
 	for top in lda.print_topics():
-		l = [s.split('*')[1] for s in top.split('+')]
-		toprint = ""
-		for s in l:
-			toprint += s + ", "
-		print toprint
-	print
+		l = [s.split('*')[1].strip() for s in top.split('+')]
+		sc = [float(s.split('*')[0]) for s in top.split('+')]
+		for i in range(len(l)):
+			s = l[i]
+			score = sc[i]
+			if s not in topic_words:
+				topic_words[s] = score
+			else:
+				topic_words[s] += score
+
+	return topic_words
 
 #df: user dataframe
 #users: list of all users
@@ -121,10 +126,36 @@ def add_topics(df, users, truth):
 			texts_F.append(rez)
 
 	# Get topics for male users
-	get_topics_for_text(texts_M)
+	topics_words_m = get_topics_for_text(texts_M)
 
 	# Get topics for female users
-	get_topics_for_text(texts_F)
+	topics_words_f = get_topics_for_text(texts_F)
+
+	# Process topics
+	sorted_twm = sorted(topics_words_m.iteritems(), key=operator.itemgetter(1), reverse=True)
+	male_words = []
+	for p in sorted_twm:
+		if p[0] not in topics_words_f:
+			male_words.append(p[0])
+
+	sorted_twf = sorted(topics_words_f.iteritems(), key=operator.itemgetter(1), reverse=True)
+	female_words = []
+	for p in sorted_twf:
+		if p[0] not in topics_words_m:
+			female_words.append(p[0])
+
+	print male_words
+	print female_words
+
+	model = models.word2vec.Word2Vec(all_texts, size=100, window=5, min_count=5, workers=4)
+	return model
+
+	score = 0
+	for word in male_words:
+		for word2 in female_words:
+			print word, ' ', word2, ' ', model.similarity(word, word2)
+			score += model.similarity(word, word2)
+		print 'Average similarity score: ', score / len(female_words)
 
 #df: user dataframe
 #users: list of all users
