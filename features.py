@@ -110,7 +110,7 @@ def get_topics_for_text(texts):
 #df: user dataframe
 #users: list of all users
 #Extracts topics and adds the top ones as features in the dataframe
-def add_topics(df, users, truth):
+def get_word_topics(users, truth):
 	user_sentences = preproc.get_all_documents(users)
 	stopwords = preproc.load_stopwords()
 
@@ -148,14 +148,35 @@ def add_topics(df, users, truth):
 	print female_words
 
 	model = models.word2vec.Word2Vec(all_texts, size=100, window=5, min_count=5, workers=4)
-	return model
+	return (male_words, female_words, model)
 
+def calculate_similarity(docs, words, model):
 	score = 0
-	for word in male_words:
-		for word2 in female_words:
+	for word in words:
+		for word2 in docs:
 			print word, ' ', word2, ' ', model.similarity(word, word2)
-			score += model.similarity(word, word2)
-		print 'Average similarity score: ', score / len(female_words)
+			try:
+				score += model.similarity(word, word2)
+			except KeyError:
+				pass
+	
+	print 'Average similarity score: ', score / (len(words) * len(docs))
+
+	return score / (len(words) * len(docs))
+
+def add_word_similarity(df, users, truth):
+	(male_words, female_words, model) = get_word_topics(users, truth)
+
+	docs = preproc.get_all_documents(users)
+	stopwords = preproc.load_stopwords()
+	id_docs = {}
+	for u in docs:
+		id_docs[u.user_id] = [x.lower() for x in docs[u] if x.lower() not in stopwords]
+
+	df['male_similarity'] = df['user_id'].map(lambda user_id: calculate_similarity(id_docs[user_id], male_words, model))
+	df['female_similarity'] = df['user_id'].map(lambda user_id: calculate_similarity(id_docs[user_id], female_words, model))
+
+	return df
 
 #df: user dataframe
 #users: list of all users
@@ -216,4 +237,5 @@ if __name__ == "__main__":
 	users = preproc.load_users(path)
 	truth = preproc.get_users_truth(path)
 
-	add_topics("", users, truth)
+	df = preproc.create_users_dataframe(path)
+	add_word_similarity(df, users, truth)

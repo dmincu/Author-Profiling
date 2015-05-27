@@ -41,6 +41,13 @@ def get_all_documents(users):
 
     return docs
 
+def get_documents_for_user(users, user_id):
+    rez = []
+    for x in users[user_id].get_documents():
+        rez = rez + re.findall(r"\w+", x.encode('utf-8'))
+
+    return rez
+
 def load_stopwords():
     stopwords = []
     with open('resources/stopwords.txt', 'rU') as f:
