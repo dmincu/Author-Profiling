@@ -28,6 +28,7 @@ def test_gender_identification():
 	df = features.add_articles(df, users_dict)
 	df = features.add_url_count(df, users_dict)
 	df = features.add_long_words(df, users)
+	df = features.add_word_similarity(df, users, truth)
 
 	#normalize features
 	print 'Normalizing features'
@@ -106,7 +107,7 @@ def test_age_identification():
 
 
 def main():
-	#test_gender_identification()
-	test_age_identification()
+	test_gender_identification()
+	#test_age_identification()
 
 main()

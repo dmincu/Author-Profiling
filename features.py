@@ -154,13 +154,10 @@ def calculate_similarity(docs, words, model):
 	score = 0
 	for word in words:
 		for word2 in docs:
-			print word, ' ', word2, ' ', model.similarity(word, word2)
 			try:
 				score += model.similarity(word, word2)
 			except KeyError:
 				pass
-	
-	print 'Average similarity score: ', score / (len(words) * len(docs))
 
 	return score / (len(words) * len(docs))
 
@@ -238,4 +235,5 @@ if __name__ == "__main__":
 	truth = preproc.get_users_truth(path)
 
 	df = preproc.create_users_dataframe(path)
-	add_word_similarity(df, users, truth)
+	df = add_word_similarity(df, users, truth)
+	print df
