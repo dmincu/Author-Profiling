@@ -32,14 +32,24 @@ def load_users(path):
 #characters.
 def get_all_documents(users):
     docs = {}
+    stopwords = load_stopwords()
 
     for user in users:
         rez = []
         for x in user.get_documents():
             rez = rez + re.findall(r"\w+", x.encode('utf-8'))
+        rez = [x.lower() for x in rez if x.lower() not in stopwords]
         docs[user] = rez
 
     return docs
+
+def load_stopwords():
+    stopwords = []
+    with open('resources/stopwords.txt', 'rU') as f:
+        for line in f:
+            stopwords.append(line.strip())
+
+    return stopwords
 
 #Similar to load_users, but returns a dictionary where key = user_id and
 #value = User instance
@@ -92,3 +102,5 @@ def create_users_dataframe(path):
 if __name__ == "__main__":
     path = 'pan15-author-profiling-training-dataset-2015-03-02\\pan15-author-profiling-training-dataset-english-2015-03-02\\'
     users = load_users(path)
+
+    get_all_documents(users)

@@ -8,7 +8,7 @@ from gensim import corpora, models, similarities
 
 LONGWORDLEN = 6
 COUNTTOPWORDS = 20
-NUMTOPICS = 5
+NUMTOPICS = 10
 
 
 # --------------- functions for computing features ----------------
@@ -98,11 +98,6 @@ def add_topics(df, users):
 	texts = []
 	for user, doc in user_sentences.iteritems():
 		texts.append(doc)
-
-	all_tokens = sum(texts, [])
-	tokens_once = set(word for word in set(all_tokens) if all_tokens.count(word) == 1)
-	texts = [[word for word in text if word not in tokens_once] for text in texts]
-
 	id2word = corpora.Dictionary(texts)
 	mm = [id2word.doc2bow(text) for text in texts]
 	lda = models.ldamodel.LdaModel(corpus=mm, id2word=id2word, num_topics=NUMTOPICS, update_every=1, chunksize=10000, passes=10)
@@ -140,22 +135,25 @@ def add_long_words(df, users):
 	result = []
 	for i in range(COUNTTOPWORDS):
 		result.append(sorted_rez[i][0])
+		df[sorted_rez[i][0]] = 0
 
 	print result
 
+	i = 0
 	for user, doc in docs.iteritems():
 		for elem in result:
 			if elem in doc:
-				df[user.user_id][elem] = 1
+				df[elem][i] = 1
 			else:
-				df[user.user_id][elem] = 0
+				df[elem][i] = 0
+		i += 1
 
 	return df
 
 #counts all the matches of links in a tweet
 def getUrlCount(tweet):
-	m=re.findall('https://', tweet)
-	n=re.findall('http://', tweet)
+	m = re.findall('https://', tweet)
+	n = re.findall('http://', tweet)
 	return len(m)+len(n)
 
 if __name__ == "__main__":
