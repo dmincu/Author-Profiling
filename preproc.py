@@ -32,13 +32,11 @@ def load_users(path):
 #characters.
 def get_all_documents(users):
     docs = {}
-    stopwords = load_stopwords()
 
     for user in users:
         rez = []
         for x in user.get_documents():
             rez = rez + re.findall(r"\w+", x.encode('utf-8'))
-        rez = [x.lower() for x in rez if x.lower() not in stopwords]
         docs[user] = rez
 
     return docs
@@ -102,5 +100,6 @@ def create_users_dataframe(path):
 if __name__ == "__main__":
     path = 'pan15-author-profiling-training-dataset-2015-03-02\\pan15-author-profiling-training-dataset-english-2015-03-02\\'
     users = load_users(path)
+    truth = get_users_truth(path)
 
     get_all_documents(users)

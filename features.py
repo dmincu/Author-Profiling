@@ -8,7 +8,7 @@ from gensim import corpora, models, similarities
 
 LONGWORDLEN = 6
 COUNTTOPWORDS = 20
-NUMTOPICS = 10
+NUMTOPICS = 5
 
 
 # --------------- functions for computing features ----------------
@@ -87,17 +87,7 @@ def add_articles(df, user_dict, articles_array = ['a', 'an', 'the']):
 
 	return df
 
-#df: user dataframe
-#users: list of all users
-#Extracts topics and adds the top ones as features in the dataframe
-
-#TODO: find other way to extract topics
-def add_topics(df, users):
-	user_sentences = preproc.get_all_documents(users)
-
-	texts = []
-	for user, doc in user_sentences.iteritems():
-		texts.append(doc)
+def get_topics_for_text(texts):
 	id2word = corpora.Dictionary(texts)
 	mm = [id2word.doc2bow(text) for text in texts]
 	lda = models.ldamodel.LdaModel(corpus=mm, id2word=id2word, num_topics=NUMTOPICS, update_every=1, chunksize=10000, passes=10)
@@ -111,6 +101,28 @@ def add_topics(df, users):
 			toprint += s + ", "
 		print toprint
 	print
+
+#df: user dataframe
+#users: list of all users
+#Extracts topics and adds the top ones as features in the dataframe
+def add_topics(df, users, truth):
+	user_sentences = preproc.get_all_documents(users)
+	stopwords = preproc.load_stopwords()
+
+	texts_M = []
+	texts_F = []
+	for user, doc in user_sentences.iteritems():
+		rez = [x.lower() for x in doc if x.lower() not in stopwords]
+		if (truth[user.user_id][0] == 'M'):
+			texts_M.append(rez)
+		else:
+			texts_F.append(rez)
+
+	# Get topics for male users
+	get_topics_for_text(texts_M)
+
+	# Get topics for female users
+	get_topics_for_text(texts_F)
 
 #df: user dataframe
 #users: list of all users
@@ -169,5 +181,6 @@ def add_url_count(df, user_dict):
 if __name__ == "__main__":
 	path = 'pan15-author-profiling-training-dataset-2015-03-02\\pan15-author-profiling-training-dataset-english-2015-03-02\\'
 	users = preproc.load_users(path)
+	truth = preproc.get_users_truth(path)
 
-	add_topics("", users)
+	add_topics("", users, truth)

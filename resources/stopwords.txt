@@ -117,6 +117,7 @@ do
 does
 doesn't
 doing
+don
 don't
 done
 down
@@ -218,6 +219,7 @@ i'm
 i've
 ie
 if
+ik
 ignored
 immediate
 in
@@ -583,3 +585,20 @@ zero
 8
 9
 0
+11
+12
+13
+14
+15
+16
+17
+18
+frzhtmoge7
+i4llyjwjvd
+ll
+en
+im
+frzhtnf42j
+cciws13
+7bujkeah
+ve
