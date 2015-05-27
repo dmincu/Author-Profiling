@@ -43,7 +43,7 @@ def test_gender_identification():
 		 'always', 'google', 'things', 'better', 'tumblr', 'school', 'because', 'someone', 'facebook',
 		 'frzhtmoge7', 'please', 'something']
 
-	feature_names = ['self_ref_count', 'articles', 'pos_words', 'neg_words', 'url_count']
+	feature_names = ['self_ref_count', 'articles', 'pos_words', 'neg_words', 'url_count', 'male_similarity', 'female_similarity']
 	all_features = feature_names + long_words
 
 	#initialize classifiers
