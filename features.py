@@ -87,9 +87,9 @@ def add_articles(df, user_dict, articles_array = ['a', 'an', 'the']):
 
 	return df
 
-def get_topics_for_text(texts, all_texts):
+def get_topics_for_text(texts):
 	id2word = corpora.Dictionary(texts)
-	mm = [id2word.doc2bow(text) for text in all_texts]
+	mm = [id2word.doc2bow(text) for text in texts]
 	lda = models.ldamodel.LdaModel(corpus=mm, id2word=id2word, num_topics=NUMTOPICS, update_every=1, chunksize=10000, passes=10)
 
 	print
@@ -121,10 +121,10 @@ def add_topics(df, users, truth):
 			texts_F.append(rez)
 
 	# Get topics for male users
-	get_topics_for_text(texts_M, all_texts)
+	get_topics_for_text(texts_M)
 
 	# Get topics for female users
-	get_topics_for_text(texts_F, all_texts)
+	get_topics_for_text(texts_F)
 
 #df: user dataframe
 #users: list of all users
