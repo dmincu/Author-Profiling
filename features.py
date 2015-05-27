@@ -130,7 +130,7 @@ def add_long_words(df, users):
 
 	sorted_rez = sorted(rez.iteritems(), key=operator.itemgetter(1), reverse=True)
 
-	print sorted_rez
+	#print sorted_rez
 
 	result = []
 	for i in range(COUNTTOPWORDS):
@@ -139,14 +139,12 @@ def add_long_words(df, users):
 
 	print result
 
-	i = 0
-	for user, doc in docs.iteritems():
-		for elem in result:
-			if elem in doc:
-				df[elem][i] = 1
-			else:
-				df[elem][i] = 0
-		i += 1
+	id_docs = {}
+	for u in docs:
+		id_docs[u.user_id] = docs[u]
+
+	for elem in result:
+		df[elem] = df['user_id'].map(lambda user_id : 1 if elem in id_docs[user_id] else 0)
 
 	return df
 
@@ -155,6 +153,18 @@ def getUrlCount(tweet):
 	m = re.findall('https://', tweet)
 	n = re.findall('http://', tweet)
 	return len(m)+len(n)
+
+def get_user_url_count(user):
+	count = 0
+	for doc in user.documents:
+		count += getUrlCount(doc)
+
+	return count
+
+def add_url_count(df, user_dict):
+	df['url_count'] = df['user_id'].map(lambda user_id : get_user_url_count(user_dict[user_id])).astype(float)
+
+	return df
 
 if __name__ == "__main__":
 	path = 'pan15-author-profiling-training-dataset-2015-03-02\\pan15-author-profiling-training-dataset-english-2015-03-02\\'
