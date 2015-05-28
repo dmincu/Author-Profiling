@@ -1,8 +1,8 @@
 # Author-Profiling
 
  Students:
-   Florin Brad
-   Diana Mincu
+   Florin Brad,
+   Diana Mincu,
    Eduard Olariu
 
  To run simply run main file
