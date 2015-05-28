@@ -50,10 +50,11 @@ def test_gender_identification():
 	log_reg = LogReg()
 	svm_clf = svm.SVC()
 	gnb_clf = GaussianNB()
+	ranfor_clf = RandomForestClassifier()
 
-	clfs = {'logistic regression' : log_reg, 'linear SVM' : svm_clf, 'GaussianNB' : gnb_clf}
+	clfs = {'logistic regression' : log_reg, 'linear SVM' : svm_clf, 'GaussianNB' : gnb_clf, 'random forest' : ranfor_clf}
 	for clf in clfs:
-		scores = cross_validation.cross_val_score(clfs[clf], df[all_features], df['label'], cv=5)
+		scores = cross_validation.cross_val_score(clfs[clf], df[all_features], df['label'], cv=10)
 		print clf + ' : ' + str(scores.mean())
 
 def test_age_identification():
